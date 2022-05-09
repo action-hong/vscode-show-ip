@@ -1,31 +1,60 @@
 import os from 'os'
 import type { ExtensionContext, StatusBarItem } from 'vscode'
-import { StatusBarAlignment, window } from 'vscode'
+import { StatusBarAlignment, commands, window, workspace } from 'vscode'
+import { NEXT } from './constants'
 
 export function activate(context: ExtensionContext) {
-  const statusBarItem = new IPAddressStatusBarItem()
+  let name: string = workspace.getConfiguration().get('showId.interfaceName') ?? 'WLAN'
+  const statusBarItem = new IPAddressStatusBarItem(name)
   context.subscriptions.push(statusBarItem)
-}
 
-const KEY = 'WLAN'
+  context.subscriptions.push(workspace.onDidChangeConfiguration((e) => {
+    if (e.affectsConfiguration('showId.interfaceName')) {
+      name = workspace.getConfiguration().get('showId.interfaceName') ?? 'WLAN'
+      statusBarItem.setInterfaceName(name)
+      statusBarItem.refresh()
+    }
+  }))
+
+  context.subscriptions.push(commands.registerCommand(NEXT, () => {
+    statusBarItem.next()
+  }))
+}
 
 class IPAddressStatusBarItem {
   private _statusBarItem: StatusBarItem
   private _refreshInterval: NodeJS.Timeout
   private _networkInterfaces?: os.NetworkInterfaceInfo[]
+  private _interfaceName: string
+  private _isFirst = true
+  private _index = 0
 
-  constructor() {
+  constructor(name: string) {
+    this._interfaceName = name
+
     this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right)
     this._statusBarItem.show()
 
     this.refresh()
 
     this._refreshInterval = setInterval(() => this.refresh(), 60 * 1000)
+
+    this._statusBarItem.command = NEXT
+  }
+
+  setInterfaceName(name: string) {
+    this._interfaceName = name
   }
 
   dispose() {
     this._statusBarItem.dispose()
     clearInterval(this._refreshInterval)
+  }
+
+  next() {
+    this._index++
+    this._isFirst = false
+    this.refresh()
   }
 
   refresh() {
@@ -35,12 +64,24 @@ class IPAddressStatusBarItem {
 
   getNetworkInterfaces() {
     const networkInterfaces = os.networkInterfaces()
+    const interfaces = Object.keys(networkInterfaces)
 
-    return networkInterfaces[KEY] || networkInterfaces[Object.keys(networkInterfaces)[0]]
+    if (this._isFirst) {
+      this._isFirst = false
+      this._index = interfaces.indexOf(this._interfaceName)
+      if (this._index === -1)
+        this._index = 0
+    }
+    else {
+      this._index = this._index % interfaces.length
+    }
+    return [networkInterfaces[interfaces[this._index]], interfaces[this._index]] as const
   }
 
   fetchNetworkInterfaces() {
-    this._networkInterfaces = this.getNetworkInterfaces()
+    const arr = this.getNetworkInterfaces()
+    this._networkInterfaces = arr[0]
+    this._interfaceName = arr[1]
   }
 
   refreshUI() {
@@ -59,6 +100,6 @@ class IPAddressStatusBarItem {
     ]
 
     bar.text = `$(home) ${ip4.address}`
-    bar.tooltip = `${KEY}\n${(ip4.mac || '').toUpperCase()}\n\n${arr.map(item => `${item.name}: ${item.value}`).join('\n')}`
+    bar.tooltip = `${this._interfaceName}\n${(ip4.mac || '').toUpperCase()}\n\n${arr.map(item => `${item.name}: ${item.value}`).join('\n')}`
   }
 }

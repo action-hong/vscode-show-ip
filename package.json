@@ -35,6 +35,24 @@
   "activationEvents": [
     "*"
   ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-show-ip.next",
+        "title": "show the next IP address"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Show IP Address",
+      "properties": {
+        "showIp.interfaceName": {
+          "type": "string",
+          "description": "Default Network interface name"
+        }
+      }
+    }
+  },
   "icon": "res/icon.png",
   "scripts": {
     "build": "tsup src/index.ts --external vscode",
