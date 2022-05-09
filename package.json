@@ -1,7 +1,7 @@
 {
   "name": "vscode-show-ip",
   "displayName": "Show IP Address",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "kkopite",
   "packageManager": "pnpm@6.32.3",
   "description": "just show the ip address",
