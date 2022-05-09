@@ -5,13 +5,17 @@
   "publisher": "kkopite",
   "packageManager": "pnpm@6.32.3",
   "description": "",
-  "keywords": [],
+  "keywords": [
+    "ip",
+    "vscode",
+    "address"
+  ],
   "homepage": "https://github.com/action-hong/vscode-show-ip#readme",
   "bugs": {
     "url": "https://github.com/action-hong/vscode-show-ip/issues"
   },
   "license": "MIT",
-  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
+  "author": "kkopitehong <kkopitehong@foxmail.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/action-hong/vscode-show-ip"
