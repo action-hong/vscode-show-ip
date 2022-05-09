@@ -44,6 +44,7 @@ class IPAddressStatusBarItem {
 
   setInterfaceName(name: string) {
     this._interfaceName = name
+    this._isFirst = true
   }
 
   dispose() {
@@ -53,7 +54,6 @@ class IPAddressStatusBarItem {
 
   next() {
     this._index++
-    this._isFirst = false
     this.refresh()
   }
 
