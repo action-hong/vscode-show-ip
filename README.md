@@ -4,6 +4,17 @@
 
 just show WLAN IP Address in StatusBar
 
+Your can see your ipv4 address on the StatusBar in the bottom right corner
+
+![img](./img/img1.gif)
+
+you can click it or exec command `vscode-show-ip.next` to change
+
+## Configuration
+
+|title|default|description|
+|--|--|--|
+|showIp.interfaceName|`WLAN`|show this interface ip4 address
 
 ## License
 
